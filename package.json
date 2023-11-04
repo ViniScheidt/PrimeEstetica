@@ -1,0 +1,18 @@
+{
+    "name": "prime-estetica",
+    "version": "1.0.0",
+    "description": "Site de e-commerce de estética automotiva",
+    "main": "index.js",
+    "scripts": {
+      "start": "echo 'Script de inicialização não definido'",
+      "test": "echo 'Sem testes definidos'"
+    },
+    "repository": {
+      "type": "git",
+      "url": "URL_DO_SEU_REPOSITORIO"
+    },
+    "author": "Seu Nome",
+    "license": "ISC",
+    "dependencies": {}
+  }
+  
