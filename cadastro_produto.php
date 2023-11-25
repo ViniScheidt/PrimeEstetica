@@ -1,51 +1,106 @@
-
-
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Conexão com o banco de dados
-$host = "127.0.0.1"; // Endereço do servidor de banco de dados
-$user = "root"; // Usuário do banco de dados
-$password = ""; // Senha do banco de dados
-$dbname = "primeestetica"; // Nome do banco de dados
+require 'vendor/autoload.php'; 
 
-// Criar conexão
-$conn = new mysqli($host, $user, $password, $dbname);
+// Carrega o arquivo .env
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
-// Verifica conexão
-if ($conn->connect_error) {
-    die("Falha na conexão: " . $conn->connect_error);
+// Conexão com o banco de dados PostgreSQL
+$host = $_ENV['DB_HOST'];
+$port = $_ENV['DB_PORT'];
+$dbname = $_ENV['DB_DATABASE'];
+$user = $_ENV['DB_USERNAME'];
+$pass = $_ENV['DB_PASSWORD'];
 
+try {
+    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Coleta os dados do formul�rio
-    $nome = $_POST["nome"];
-    $preco = $_POST["preco"];
-    $categoria = $_POST["categoria"];
+    // Buscar tipos
+    $stmtTipos = $pdo->query("SELECT id, nome FROM tipo");
+    $tipos = $stmtTipos->fetchAll(PDO::FETCH_ASSOC);
+
+    // Buscar subtipos
+    $stmtSubtipos = $pdo->query("SELECT id, nome FROM subtipo");
+    $subtipos = $stmtSubtipos->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // Coleta os dados do formulário
+        $nome = $_POST["nome"];
+        $preco = $_POST["preco"];
+        $descricao = $_POST["descricao"];
+        $tipoId = $_POST["tipo"];  // ID do tipo selecionado
+        $subtipoId = $_POST["subtipo"];  // ID do subtipo selecionado
+
+        // Trata o upload da imagem
+        $imagem = $_FILES["imagem"]["name"];
+        $imagem_temp = $_FILES["imagem"]["tmp_name"];
+
+        // AWS S3
+        $s3Client = new Aws\S3\S3Client([
+            'version'     => 'latest',
+            'region'      => $_ENV['AWS_DEFAULT_REGION'],
+            'credentials' => [
+                'key'    => $_ENV['AWS_ACCESS_KEY_ID'],
+                'secret' => $_ENV['AWS_SECRET_ACCESS_KEY'],
+            ],
+        ]);
+
+        $bucketName = $_ENV['S3_BUCKET_NAME'];
+        $key = 'uploads/' . basename($imagem);
+
+        try {
+            // Upload da imagem para o S3
+            $result = $s3Client->putObject([
+                'Bucket' => $bucketName,
+                'Key'    => $key,
+                'SourceFile' => $imagem_temp,
+                
+            ]);
+
+            $imagemUrl = $result['ObjectURL'];
+
+            // Prepara a instrução SQL para inserção
+            $sql = "INSERT INTO produtos (nome, preco, descricao, tipo_id, subtipo_id, imagem) VALUES (?, ?, ?, ?, ?, ?)";
+
+            // Prepara a instrução e faz o bind dos parâmetros
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$nome, $preco, $descricao, $tipoId, $subtipoId, $imagemUrl]);
+
+            echo "Produto inserido com sucesso.";
+        } catch (Aws\S3\Exception\S3Exception $e) {
+            echo "Erro no upload da imagem: " . $e->getMessage();
+        }
+    }
+    if (isset($_GET['action']) && $_GET['action'] == 'fetch_options') {
+        try {
+            $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Trata o upload da imagem (voc� deve adicionar valida��o e seguran�a aqui)
-    $imagem = $_FILES["imagem"]["name"];
-    $imagem_temp = $_FILES["imagem"]["tmp_name"];
+            // Buscar tipos e subtipos
+            $stmtTipos = $pdo->query("SELECT id, nome FROM tipo");
+            $tipos = $stmtTipos->fetchAll(PDO::FETCH_ASSOC);
     
-    // Move a imagem para um diret�rio de uploads
-    move_uploaded_file($imagem_temp, "diretorio_de_uploads/" . $imagem);
+            $stmtSubtipos = $pdo->query("SELECT id, nome FROM subtipo");
+            $subtipos = $stmtSubtipos->fetchAll(PDO::FETCH_ASSOC);
     
-    // Prepara a instru��o SQL para inser��o
-    $sql = "INSERT INTO produtos (nome, preco, categoria, imagem) VALUES (?, ?, ?, ?)";
-    
-    // Prepara a instru��o e faz o bind dos par�metros
-    $stmt = $$conn->prepare($sql);
-    $stmt->bind_param("sdsb", $nome, $preco, $categoria, $imagem);
-
-    // Executa a inser��o
-    if ($stmt->execute()) {
-        echo "Produto inserido com sucesso.";
-    } else {
-        echo "Erro ao inserir o produto: " . $stmt->error;
+            // Responder com JSON
+            header('Content-Type: application/json');
+            echo json_encode(['tipos' => $tipos, 'subtipos' => $subtipos]);
+            exit;
+        } catch (PDOException $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+            exit;
+        }
     }
 
-    // Fecha a conex�o com o banco de dados
-    $$conn->close();
+
+} catch (PDOException $e) {
+    echo "Erro de conexão com o banco: " . $e->getMessage();
 }
+
 ?>

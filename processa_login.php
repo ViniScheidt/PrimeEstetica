@@ -1,50 +1,53 @@
 <?php
-// Conexão com o banco de dados
-$host = "127.0.0.1"; // Endereço do servidor de banco de dados
-$user = "root"; // Usuário do banco de dados
-$password = ""; // Senha do banco de dados
-$dbname = "primeestetica"; // Nome do banco de dados
+session_start(); 
 
-// Criar conexão
-$conn = new mysqli($host, $user, $password, $dbname);
 
-// Verifica conexão
-if ($conn->connect_error) {
-    die("Falha na conexão: " . $conn->connect_error);
+// Carregar as variáveis de ambiente do arquivo .env
+$lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+foreach ($lines as $line) {
+    if (strpos(trim($line), '#') === 0) continue;
+    list($name, $value) = explode('=', $line, 2);
+    $_ENV[$name] = trim($value);
 }
 
-// Verificação e tratamento das entradas
-$email = isset($_POST['email']) ? $_POST['email'] : '';
-$senha = isset($_POST['senha']) ? $_POST['senha'] : '';
+// Conectar ao banco de dados
+$host = $_ENV['DB_HOST'];
+$port = $_ENV['DB_PORT'];
+$dbname = $_ENV['DB_DATABASE'];
+$user = $_ENV['DB_USERNAME'];
+$pass = $_ENV['DB_PASSWORD'];
 
-// Preparando a consulta SQL
-$sql = "SELECT id, senha, id_cargo FROM usuarios WHERE email = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $email);
+try {
+    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Executa a consulta
-$stmt->execute();
-$result = $stmt->get_result();
+    // Obter os dados do formulário
+    $email = $_POST['email'];
+    $senha = $_POST['senha'];
 
-if ($result->num_rows > 0) {
-    // Verifica a senha
-    $row = $result->fetch_assoc();
-    if (password_verify($senha, $row['senha'])) {
-        // Inicia a sessão e armazena o id_cargo
-        session_start();
-        $_SESSION['usuario_id'] = $row['id'];
-        $_SESSION['id_cargo'] = $row['id_cargo'];
+    // Preparar a consulta SQL
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+    $stmt->execute([$email]);
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    
 
-        // Redireciona para a página principal
-        header("Location: index.php");
-        exit();
+    // Verificar senha
+    if ($usuario && password_verify($senha, $usuario['senha'])) {
+        // Login bem-sucedido
+
+        // Armazenar informações do usuário na sessão
+        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['usuario_email'] = $usuario['email'];
+        $_SESSION['usuario_nome'] = $usuario['nome'];
+        $_SESSION['usuario_cargo'] = $usuario['id_cargo'];
+
+        // Redirecionar para a página inicial
+        header('Location: index.php');
+        exit(); 
     } else {
-        echo "Senha incorreta!";
+        
     }
-} else {
-    echo "Usuário não encontrado!";
-}
 
-// Fecha a conexão
-$conn->close();
-?>
+} catch (PDOException $e) {
+    echo "Erro no login: " . $e->getMessage();
+}

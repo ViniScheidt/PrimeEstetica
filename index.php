@@ -1,5 +1,9 @@
 <?php
 session_start(); // Inicia a sessão PHP
+
+echo "Usuário Cargo: " . (isset($_SESSION['usuario_cargo']) ? $_SESSION['usuario_cargo'] : "não definido");
+
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -54,12 +58,12 @@ session_start(); // Inicia a sessão PHP
 </li>
 <li class="nav-item dropdown">
     <?php
-    if (isset($_SESSION['id_cargo']) && $_SESSION['id_cargo'] == 2) {
+    if (isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] == 2) {
         echo '<a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
         echo 'Administração';
         echo '</a>';
         echo '<div class="dropdown-menu" aria-labelledby="adminDropdown">';
-        echo '<a class="dropdown-item" href="cadastro_produto.php">Cadastro de Produto</a>';
+        echo '<a class="dropdown-item" href="cadastro_produto.html">Cadastro de Produto</a>';
         // Adicione mais links de administração aqui se necessário
         echo '</div>';
     }

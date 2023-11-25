@@ -1,38 +1,39 @@
 <?php
 
-// Configurações do banco de dados
-$host = "127.0.0.1"; // Endereço do servidor de banco de dados local
-$user = "root"; // Usuário padrão do MySQL
-$password = ""; // Senha (vazia por padrão em ambientes locais)
-$dbname = "primeestetica"; // Nome do seu banco de dados
 
-// Conexão com o banco de dados
-$conn = new mysqli($host, $user, $password, $dbname);
-
-// Verifica se houve erro de conexão
-if ($conn->connect_error) {
-    die("Conexão falhou: " . $conn->connect_error);
+$lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+foreach ($lines as $line) {
+    if (strpos(trim($line), '#') === 0) continue;
+    list($name, $value) = explode('=', $line, 2);
+    $_ENV[$name] = trim($value);
 }
 
-// Recebendo os dados do formulário
-$email = $conn->real_escape_string($_POST['email']);
-$senha = password_hash($_POST['senha'], PASSWORD_DEFAULT); // Criptografa a senha
-$nome = $conn->real_escape_string($_POST['nome']);
-$cpf = $conn->real_escape_string($_POST['cpf']);
-$data_nascimento = $conn->real_escape_string($_POST['data_nascimento']);
-$endereco = $conn->real_escape_string($_POST['endereco']);
 
-// Query SQL para inserir os dados na tabela
-$sql = "INSERT INTO usuarios (email, senha, nome, cpf, data_nascimento, endereco) 
-        VALUES ('$email', '$senha', '$nome', '$cpf', '$data_nascimento', '$endereco')";
+$host = $_ENV['DB_HOST'];
+$port = $_ENV['DB_PORT'];
+$dbname = $_ENV['DB_DATABASE'];
+$user = $_ENV['DB_USERNAME'];
+$pass = $_ENV['DB_PASSWORD'];
 
-// Executa a query
-if ($conn->query($sql) === TRUE) {
-    echo "Novo registro criado com sucesso";
-} else {
-    echo "Erro: " . $sql . "<br>" . $conn->error;
+try {
+    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Recebendo os dados do formulário
+    $nome = $_POST['nome'];
+    $email = $_POST['email'];
+    $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT); 
+    $cpf = $_POST['cpf'];
+    $data_nascimento = $_POST['data_nascimento'];
+    $endereco = $_POST['endereco'];
+
+    // Preparando a consulta SQL para inserção dos dados
+    $stmt = $pdo->prepare("INSERT INTO usuarios (email, senha, nome, cpf, data_nascimento, endereco, id_cargo) VALUES (?, ?, ?, ?, ?, ?, 1)");
+    $stmt->execute([$email, $senha, $nome, $cpf, $data_nascimento, $endereco]);
+    
+
+    echo "Usuário cadastrado com sucesso.";
+
+} catch (PDOException $e) {
+    die("Erro no cadastro: " . $e->getMessage());
 }
-
-// Fecha a conexão
-$conn->close();
-?>
