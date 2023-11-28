@@ -27,94 +27,55 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// Array para armazenar os itens no carrinho
-let carrinhoItens = [];
-
-// Função para adicionar um item ao carrinho
-function adicionarItemAoCarrinho(produto) {
-    const itemExistente = carrinhoItens.find(item => item.produto.id === produto.id);
-
-    if (itemExistente) {
-        itemExistente.quantidade += 1;
-    } else {
-        carrinhoItens.push({ produto, quantidade: 1 });
-    }
-
-    atualizarCarrinho();
-}
-
-// Função para remover um item do carrinho
-function removerItemDoCarrinho(produtoId) {
-    carrinhoItens = carrinhoItens.filter(item => item.produto.id !== produtoId);
-    atualizarCarrinho();
-}
-
-// Função para atualizar a exibição do carrinho de compras
-function atualizarCarrinho() {
-    const carrinhoItemsContainer = document.getElementById('carrinho-items');
-    carrinhoItemsContainer.innerHTML = '';
-
-    carrinhoItens.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${item.produto.nome}</td>
-            <td>R$ ${item.produto.preco.toFixed(2)}</td>
-            <td>
-                <input type="number" value="${item.quantidade}" min="1" onchange="atualizarQuantidade(${item.produto.id}, this.value)">
-            </td>
-            <td>R$ ${(item.produto.preco * item.quantidade).toFixed(2)}</td>
-        `;
-
-        carrinhoItemsContainer.appendChild(row);
-    });
-}
-
-// Função para atualizar a quantidade de um item no carrinho
-function atualizarQuantidade(produtoId, novaQuantidade) {
-    novaQuantidade = parseInt(novaQuantidade);
-    const itemExistente = carrinhoItens.find(item => item.produto.id === produtoId);
-
-    if (itemExistente && novaQuantidade >= 1) {
-        itemExistente.quantidade = novaQuantidade;
-        atualizarCarrinho();
-    }
-}
-
-// Função para exibir o carrinho na página
-function exibirCarrinho() {
-    atualizarCarrinho();
-}
-
-// Chamada da função para exibir o carrinho quando a página carregar
-exibirCarrinho();
-
-// Captura elementos HTML
-const decrementButton = document.getElementById('decrement');
-const incrementButton = document.getElementById('increment');
-const quantityInput = document.getElementById('quantity');
+// Captura o botão "Adicionar ao Carrinho" e o campo de quantidade
 const addToCartButton = document.getElementById('produto-comprar');
+const quantityInput = document.getElementById('quantity');
 
-// Define o evento de clique no botão de incremento
-incrementButton.addEventListener('click', function() {
-    // Incrementa a quantidade em 1
-    quantityInput.value = parseInt(quantityInput.value) + 1;
-});
-
-// Define o evento de clique no botão de decremento
-decrementButton.addEventListener('click', function() {
-    // Verifica se a quantidade é maior que 1 antes de decrementar
-    if (parseInt(quantityInput.value) > 1) {
-        quantityInput.value = parseInt(quantityInput.value) - 1;
-    }
+// Define o evento de clique no botão "Adicionar ao Carrinho"
+addToCartButton.addEventListener('click', function() {
+    // Obtém a quantidade selecionada pelo usuário
+    const quantity = quantityInput.value;
+    
+    // Atualiza o valor do campo oculto no formulário
+    document.getElementById('quantidade-input').value = quantity;
+    
+    // Submete o formulário para a página carrinho.html
+    document.getElementById('carrinho-form').submit();
 });
 
 // Define o evento de clique no botão "Adicionar ao Carrinho"
 addToCartButton.addEventListener('click', function() {
-    // Redireciona para a página carrinho.html e envia a quantidade como parâmetro
+    // Obtém a quantidade selecionada pelo usuário
     const quantity = quantityInput.value;
-    window.location.href = `carrinho.html?quantidade=${quantity}`;
+    
+    // Obtém os dados do produto
+    const produtoNome = document.getElementById('produto-nome').textContent;
+    const produtoImagem = document.getElementById('produto-imagem').src;
+    const produtoDescricao = document.getElementById('produto-descricao').textContent;
+    const produtoPreco = document.getElementById('produto-preco').textContent;
+    
+    // Cria uma URL com os parâmetros
+    const carrinhoUrl = `carrinho.html?quantidade=${quantity}&nome=${produtoNome}&imagem=${produtoImagem}&descricao=${produtoDescricao}&preco=${produtoPreco}`;
+    
+    // Redireciona o usuário para a página carrinho.html com os parâmetros
+    window.location.href = carrinhoUrl;
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtém os parâmetros da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const quantidade = urlParams.get('quantidade');
+    const produtoNome = urlParams.get('nome');
+    const produtoImagem = urlParams.get('imagem');
+    const produtoDescricao = urlParams.get('descricao');
+    const produtoPreco = urlParams.get('preco');
 
+    // Exibe os dados do item do carrinho na página
+    document.getElementById('carrinho-quantidade').textContent = quantidade;
+    document.getElementById('carrinho-nome').textContent = produtoNome;
+    document.getElementById('carrinho-imagem').src = produtoImagem;
+    document.getElementById('carrinho-descricao').textContent = produtoDescricao;
+    document.getElementById('carrinho-preco').textContent = produtoPreco;
+});
 
 

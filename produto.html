@@ -6,59 +6,86 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <title>Detalhes do Produto</title>
 </head>
-
 <body>
-    <!-- <div id="produto-details" class=""></div> -->
-
-    
-    
     <div class="container mt-5">
+        <!-- Detalhes do Produto -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <!-- Espaço reservado para o Slider de Imagens -->
+                <div id="imageSlider" class="carousel slide" data-ride="carousel">
+                    <!-- Imagens do Slider -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img id="produto-imagem" class="d-block w-100" alt="Cookies">
+                        </div>
+                        <!-- Adicione mais itens se necessário -->
+                    </div>
+                    <!-- Controles esquerdo e direito -->
+                    <a class="carousel-control-prev" href="#imageSlider" data-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </a>
+                    <a class="carousel-control-next" href="#imageSlider" data-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <!-- Descrição do Produto -->
+                <h2 id="produto-nome"></h2>
+                <p id="produto-preco" class="price"></p>
+                <!-- Quantidade e Adicionar ao Carrinho -->
+                <div class="quantity mt-3 mb-3">
+                    <button id="decrement" class="btn btn-secondary" type="button">-</button>
+                    <input id="quantity" type="number" class="form-control" value="1" min="1">
+                    <button id="increment" class="btn btn-secondary" type="button">+</button>
+                </div>
+                
+                <button id="produto-comprar" class="btn btn-primary">Adicionar ao carrinho</button>
+                <!-- Texto de Detalhes do Produto -->
+                <p id="produto-descricao" class="mt-4"></p>
+            </div>
+        </div>
 
-    
-<!-- Detalhes do Produto -->
-<div class="row mt-4">
-  <div class="col-md-6">
-    <!-- Espaço reservado para o Slider de Imagens -->
-    <div id="imageSlider" class="carousel slide" data-ride="carousel">
-      <!-- Imagens do Slider -->
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <img id="produto-imagem" class="d-block w-100" alt="Cookies">
-        </div>s
-        <!-- Adicione mais itens se necessário -->
-      </div>
-      <!-- Controles esquerdo e direito -->
-      <a class="carousel-control-prev" href="#imageSlider" data-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-      </a>
-      <a class="carousel-control-next" href="#imageSlider" data-slide="next">
-        <span class="carousel-control-next-icon"></span>
-      </a>
+        <form id="carrinho-form" action="carrinho.html" method="POST">
+            <input type="hidden" id="quantidade-input" name="quantidade" value="1">
+            <input type="hidden" id="produto-nome-input" name="nome" value="">
+            <input type="hidden" id="produto-preco-input" name="preco" value="">
+            <input type="hidden" id="produto-descricao-input" name="descricao" value="">
+            <input type="hidden" id="produto-imagem-input" name="imagem" value="">
+        </form>
+
+        <!-- JS do Bootstrap e dependências -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="script.js"></script>
+        
+        <script>
+          // Captura o botão "Adicionar ao Carrinho" e o campo de quantidade
+          const addToCartButton = document.getElementById('produto-comprar');
+          const quantityInput = document.getElementById('quantity');
+      
+          // Define o evento de clique no botão "Adicionar ao Carrinho"
+          addToCartButton.addEventListener('click', function() {
+              // Obtém a quantidade selecionada pelo usuário
+              const quantity = quantityInput.value;
+      
+              // Atualiza o valor do campo oculto de quantidade no formulário
+              document.getElementById('quantidade-input').value = quantity || 1;
+              
+              // Preenche os campos ocultos com os dados do produto, independentemente da quantidade
+              document.getElementById('produto-nome-input').value = document.getElementById('produto-nome').textContent;
+              document.getElementById('produto-imagem-input').value = document.getElementById('produto-imagem').src;
+              document.getElementById('produto-descricao-input').value = document.getElementById('produto-descricao').textContent;
+              document.getElementById('produto-preco-input').value = document.getElementById('produto-preco').textContent;
+      
+              // Submete o formulário para a página carrinho.html
+              document.getElementById('carrinho-form').submit();
+          });
+      </script>
+      
+      </script>
+      
     </div>
-  </div>
-  <div class="col-md-6">
-    <!-- Descrição do Produto -->
-    <h2 id="produto-nome"></h2>
-    <p id="produto-preco" class="price"></p>
-    <!-- Quantidade e Adicionar ao Carrinho -->
-    <div class="quantity mt-3 mb-3">
-      <button id="decrement" class="btn btn-secondary" type="button">-</button>
-      <input id="quantity" type="number" class="form-control" value="1" min="1">
-      <button id="increment" class="btn btn-secondary" type="button">+</button>
-    </div>
-    
-    <button id="produto-comprar" class="btn btn-primary">Adicionar ao carrinho</button>
-    <!-- Texto de Detalhes do Produto -->
-    <p id="produto-descricao" class="mt-4"></p>
-  </div>
-</div>
-
-<!-- JS do Bootstrap e dependências -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="script.js"></script>
-
 </body>
 </html>
-

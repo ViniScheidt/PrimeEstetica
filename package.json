@@ -4,7 +4,7 @@
     "description": "Site de e-commerce de estética automotiva",
     "main": "index.js",
     "scripts": {
-      "start": "echo 'Script de inicialização não definido'",
+      "start": "node script.js",
       "test": "echo 'Sem testes definidos'"
     },
     "repository": {
@@ -14,5 +14,6 @@
     "author": "Seu Nome",
     "license": "ISC",
     "dependencies": {}
+    
   }
   

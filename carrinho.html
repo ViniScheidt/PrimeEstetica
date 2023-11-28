@@ -3,24 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <title>Carrinho de Compras</title>
 </head>
 <body>
-    <h1>Carrinho de Compras</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Produto</th>
-                <th>Preço Unitário</th>
-                <th>Quantidade</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody id="carrinho-items">
-            <!-- Os itens do carrinho serão exibidos aqui dinamicamente -->
-        </tbody>
-    </table>
-    <a href="produto.html" class="btn btn-primary">Continuar Comprando</a>
-    <script src="script.js"></script>
+    <div class="container mt-5">
+        <h1>Carrinho de Compras</h1>
+        <div id="carrinho-details" class="card">
+            <div class="card-body">
+                <h2 id="produto-nome" class="card-title"></h2>
+                <img id="produto-imagem" src="" alt="" class="card-img-top" style="max-width: 200px; height: auto;">
+                <p id="produto-descricao" class="card-text"></p>
+                <p id="produto-preco" class="card-text"></p>
+                <p id="valor-total" class="card-text"></p>
+                <p class="card-text">Quantidade: <span id="quantidade"></span></p>
+                <a href="pagamento.html" class="botao">Finalizar Compra</a>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="carrinho.html" class="btn btn-primary">Voltar ao Carrinho</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Pega os parâmetros da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const nomeProduto = urlParams.get('nome');
+            const imagemProduto = urlParams.get('imagem');
+            const descricaoProduto = urlParams.get('descricao');
+            const precoProduto = urlParams.get('preco');
+            const quantidade = urlParams.get('quantidade');
+    
+            // Preencha os elementos HTML com os detalhes do produto
+            document.getElementById('produto-nome').textContent = nomeProduto;
+            document.getElementById('produto-imagem').src = imagemProduto;
+            document.getElementById('produto-descricao').textContent = descricaoProduto;
+            document.getElementById('produto-preco').textContent = `Preço: R$ ${precoProduto}`;
+            document.getElementById('quantidade').textContent = quantidade;
+    
+            // Limpeza e conversão do preço
+            const precoLimpo = precoProduto.replace('R$', '').replace(',', '.').trim();
+            const precoUnitario = parseFloat(precoLimpo);
+    
+            // Conversão da quantidade
+            const quantidadeNumerica = parseInt(quantidade);
+    
+            // Verifica se ambos são números válidos
+            if (!isNaN(precoUnitario) && !isNaN(quantidadeNumerica)) {
+                const valorTotal = precoUnitario * quantidadeNumerica;
+                document.getElementById('valor-total').textContent = `Valor Total: R$ ${valorTotal.toFixed(2)}`;
+            } else {
+                document.getElementById('valor-total').textContent = 'Valor Total: R$0';
+            }
+
+        });
+    </script>
 </body>
 </html>
