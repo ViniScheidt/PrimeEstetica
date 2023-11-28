@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Cadastro de Produto</title>
+    <!-- Inclua o CSS do Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <script>
+        
         document.addEventListener('DOMContentLoaded', function() {
             fetch('cadastro_produto.php?action=fetch_options')
                 .then(response => response.json())
@@ -27,40 +30,43 @@
                 })
                 .catch(error => console.error('Erro ao buscar tipos e subtipos:', error));
         });
-        </script>
+        
+    </script>
 </head>
 <body>
-    <h1>Cadastro de Produto</h1>
-    <form action="cadastro_produto.php" method="post" enctype="multipart/form-data">
-        <div>
-            <label for="nome">Nome do Produto:</label>
-            <input type="text" id="nome" name="nome" required>
-        </div>
-        <div>
-            <label for="descricao">Descrição:</label>
-            <textarea id="descricao" name="descricao" required></textarea>
-        </div>
-        <div>
-            <label for="preco">Preço:</label>
-            <input type="number" id="preco" name="preco" step="0.01" required>
-        </div>
-        <div>
-            <label for="tipo">Tipo:</label>
-            <select id="tipo" name="tipo" required>
-               
-            </select>
-        </div>
-        <div>
-            <label for="subtipo">Subtipo:</label>
-            <select id="subtipo" name="subtipo" required>
-               
-            </select>
-        </div>
-        <div>
-            <label for="imagem">Imagem do Produto:</label>
-            <input type="file" id="imagem" name="imagem" required>
-        </div>
-        <button type="submit">Cadastrar Produto</button>
-    </form>
+    <div class="container">
+        <h1 class="my-4">Cadastro de Produto</h1>
+        <form action="cadastro_produto.php" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="nome">Nome do Produto:</label>
+                <input type="text" class="form-control" id="nome" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea class="form-control" id="descricao" name="descricao" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="preco">Preço:</label>
+                <input type="number" class="form-control" id="preco" name="preco" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="tipo">Tipo:</label>
+                <select class="form-control" id="tipo" name="tipo" required>
+                    <!-- Opções de tipo aqui -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="subtipo">Subtipo:</label>
+                <select class="form-control" id="subtipo" name="subtipo" required>
+                    <!-- Opções de subtipo aqui -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="imagem">Imagem do Produto:</label>
+                <input type="file" class="form-control-file" id="imagem" name="imagem" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar Produto</button>
+        </form>
+    </div>
 </body>
 </html>

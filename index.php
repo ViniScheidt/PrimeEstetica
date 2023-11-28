@@ -1,10 +1,38 @@
 <?php
 session_start(); // Inicia a sessão PHP
 
-echo "Usuário Cargo: " . (isset($_SESSION['usuario_cargo']) ? $_SESSION['usuario_cargo'] : "não definido");
+unset($_SESSION['id_usuario']);
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
+require 'vendor/autoload.php'; 
+
+// Carrega o arquivo .env
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+// Conexão com o banco de dados PostgreSQL
+$host = $_ENV['DB_HOST'];
+$port = $_ENV['DB_PORT'];
+$dbname = $_ENV['DB_DATABASE'];
+$user = $_ENV['DB_USERNAME'];
+$pass = $_ENV['DB_PASSWORD'];
+try {
+    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Busca os produtos no banco de dados
+    $stmt = $pdo->query("SELECT id, nome, preco, imagem FROM produtos");
+    $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro de conexão com o banco: " . $e->getMessage();
+    $produtos = []; // Define produtos como um array vazio em caso de erro
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -12,9 +40,6 @@ echo "Usuário Cargo: " . (isset($_SESSION['usuario_cargo']) ? $_SESSION['usuari
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prime Estética</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <a href="login.html">Login</a>
-<a href="cadastro.html">Cadastro</a>
-
     <style>
         .card-produto {
             margin: 10px;
@@ -28,77 +53,71 @@ echo "Usuário Cargo: " . (isset($_SESSION['usuario_cargo']) ? $_SESSION['usuari
             height: auto;
         }
     </style>
-</head>ds
+</head>
 <body>
-    <!-- Navbar com Dropdown -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Prime Estética</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home</a>
-                </li>
-                <!-- ... Restante do código ... -->
-
-<!-- Dropdown para Filtros -->
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="filtroDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Externo
-    </a>
-    <div class="dropdown-menu" aria-labelledby="filtroDropdown">
-        <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('vidros')">Vidros</a>
-        <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('lataria')">Lataria</a>
-        <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('rodas e pneus')">Rodas e Pneus</a>
-        <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('plasticos')">Plásticos</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Prime Estética</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home</a>
+            </li>
+            <!-- Dropdown para Filtros -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="filtroDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Externo
+                </a>
+                <div class="dropdown-menu" aria-labelledby="filtroDropdown">
+                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('vidros')">Vidros</a>
+                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('lataria')">Lataria</a>
+                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('rodas e pneus')">Rodas e Pneus</a>
+                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('plasticos')">Plásticos</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <?php
+                if (isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] == 2) {
+                    echo '<a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    echo 'Administração';
+                    echo '</a>';
+                    echo '<div class="dropdown-menu" aria-labelledby="adminDropdown">';
+                    echo '<a class="dropdown-item" href="cadastro_produto.html">Cadastro de Produto</a>';
+                    // Adicione mais links de administração aqui se necessário
+                    echo '</div>';
+                }
+                ?>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="cadastro.html">Cadastre-se</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="login.html">Login</a>
+            </li>
+        </ul>
     </div>
-
-</li>
-<li class="nav-item dropdown">
-    <?php
-    if (isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] == 2) {
-        echo '<a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-        echo 'Administração';
-        echo '</a>';
-        echo '<div class="dropdown-menu" aria-labelledby="adminDropdown">';
-        echo '<a class="dropdown-item" href="cadastro_produto.html">Cadastro de Produto</a>';
-        // Adicione mais links de administração aqui se necessário
-        echo '</div>';
-    }
-    ?>
-</li>
+</nav>
 
 
-
-
-
-            </ul>
-        </div>
-    </nav>
-    
-    <div id="detalhes-produto" class="container mt-4" style="display: none;">
-        <h2>Detalhes do Produto</h2>
-        <div id="conteudo-produto">
-            <!-- Detalhes do produto serão carregados aqui -->
-        </div>
-        <button onclick="voltarParaProdutos()" class="btn btn-primary">Voltar aos Produtos</button>
+<!-- Seção de Produtos -->
+<div id="produtos" class="container mt-4">
+    <h2>Produtos</h2>
+    <div class="row" id="lista-produtos">
+        <?php foreach ($produtos as $produto): ?>
+            <div class="col-md-4 card-produto">
+                <img src="<?= htmlspecialchars($produto['imagem']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
+                <h3><?= htmlspecialchars($produto['nome']) ?></h3>
+                <p>R$ <?= number_format($produto['preco'], 2, ',', '.') ?></p>
+                <a href="produto.html?id=<?= $produto['id'] ?>" class="btn btn-primary">Ver mais detalhes</a>
+            </div>
+        <?php endforeach; ?>
     </div>
+</div>
 
-
-
-
-    <!-- Seção de Produtos -->
-    <div id="produtos" class="container mt-4">
-        <h2>Produtos</h2>
-        <div class="row" id="lista-produtos">
-            <!-- Os produtos serão carregados aqui via JavaScript -->
-        </div>
-    </div>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="script.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

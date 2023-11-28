@@ -59,13 +59,13 @@ try {
                 'Bucket' => $bucketName,
                 'Key'    => $key,
                 'SourceFile' => $imagem_temp,
-                
+                'ContentType' => $_FILES["imagem"]["type"]
             ]);
 
             $imagemUrl = $result['ObjectURL'];
 
             // Prepara a instrução SQL para inserção
-            $sql = "INSERT INTO produtos (nome, preco, descricao, tipo_id, subtipo_id, imagem) VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO produtos (nome, preco, descricao, id_tipo, id_subtipo, imagem) VALUES (?, ?, ?, ?, ?, ?)";
 
             // Prepara a instrução e faz o bind dos parâmetros
             $stmt = $pdo->prepare($sql);
