@@ -67,17 +67,6 @@ try {
             </li>
             <!-- Dropdown para Filtros -->
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="filtroDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Externo
-                </a>
-                <div class="dropdown-menu" aria-labelledby="filtroDropdown">
-                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('vidros')">Vidros</a>
-                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('lataria')">Lataria</a>
-                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('rodas e pneus')">Rodas e Pneus</a>
-                    <a class="dropdown-item" href="#" onclick="filtrarPorCategoria('plasticos')">Plásticos</a>
-                </div>
-            </li>
-            <li class="nav-item dropdown">
                 <?php
                 if (isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] == 2) {
                     echo '<a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
