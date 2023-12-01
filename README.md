@@ -25,7 +25,7 @@ O Prime Estética é uma aplicação web desenhada para otimizar a experiência 
 
 ## Pré-requisitos
 
-- Conhecimento em PHP, PostgreSQL, HTML, CSS, JavaScript e Ubuntu Server.
+- Conhecimento em PHP, PostgreSQL, HTML/CSS, JavaScript e Ubuntu Server.
 - Conta na AWS para utilização dos serviços RDS e EC2.
 
 ## Instalação e Configuração
@@ -74,6 +74,9 @@ O sistema utiliza o New Relic para monitoramento e análise de desempenho em tem
 2. Na aba de administração, adicione novos produtos fornecendo os detalhes necessários.
 3. Teste as funcionalidades de gestão de produtos.
 
+## Repetindo os Testes
+
+Para assegurar a consistência e a eficácia do sistema, repita os processos de teste conforme necessário.
 
 ## Contato
 
