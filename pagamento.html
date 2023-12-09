@@ -3,12 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <title>Pagamento</title>
-   
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        body {
+            flex: 1;
+        }
+        img {
+            max-width: 50%; 
+            height: auto;
+            display: block;
+            margin-bottom: 20px; 
+        }
+        .botao {
+            text-decoration: none;
+            background-color: #007BFF; 
+            color: #fff;
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            font-weight: bold;
+            transition: background-color 0.3s; 
+        }
+        .botao:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <img src="https://imagensprod.s3.sa-east-1.amazonaws.com/imagem_2023-11-28_131238870.png" alt="Imagem de Pagamento">
-
-   
-    <a href="mailto:exemplo@exemplo.com?subject=Comprovante de Pagamento&body=Nome do Produto: [nome], Preço: R$[preco], Quantidade: [quantidade]" class="botao">Enviar Comprovante</a>
+    <div class="content">
+        <img src="https://imagensprod.s3.sa-east-1.amazonaws.com/imagem_2023-11-28_131238870.png" alt="Imagem de Pagamento">
+        <a href="https://wa.me/5547996139611?text=Segue+comprovante+de+pagamento" class="botao">Enviar Comprovante</a>
+    </div>
 </body>
 </html>

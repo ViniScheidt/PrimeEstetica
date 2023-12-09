@@ -1,12 +1,9 @@
 <?php
 session_start(); // Inicia a sessão PHP
 
-unset($_SESSION['id_usuario']);
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
 
 require 'vendor/autoload.php'; 
 
@@ -20,6 +17,7 @@ $port = $_ENV['DB_PORT'];
 $dbname = $_ENV['DB_DATABASE'];
 $user = $_ENV['DB_USERNAME'];
 $pass = $_ENV['DB_PASSWORD'];
+
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -49,8 +47,8 @@ try {
             text-align: center;
         }
         .card-produto img {
-            max-width: 100%;
-            height: auto;
+            max-width: auto;
+            height: 150;
         }
     </style>
 </head>
@@ -65,7 +63,6 @@ try {
             <li class="nav-item active">
                 <a class="nav-link" href="#">Home</a>
             </li>
-            <!-- Dropdown para Filtros -->
             <li class="nav-item dropdown">
                 <?php
                 if (isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] == 2) {
@@ -79,16 +76,22 @@ try {
                 }
                 ?>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="cadastro.html">Cadastre-se</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="login.html">Login</a>
-            </li>
+            <!-- Verifica se o usuário tem cargo 1 ou 2 -->
+            <?php if (isset($_SESSION['usuario_cargo']) && in_array($_SESSION['usuario_cargo'], [1, 2])): ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="sair.php">Sair</a>
+                </li>
+            <?php else: ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="cadastro.html">Cadastre-se</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="login.html">Login</a>
+                </li>
+            <?php endif; ?>
         </ul>
     </div>
 </nav>
-
 
 <!-- Seção de Produtos -->
 <div id="produtos" class="container mt-4">
@@ -96,7 +99,7 @@ try {
     <div class="row" id="lista-produtos">
         <?php foreach ($produtos as $produto): ?>
             <div class="col-md-4 card-produto">
-                <img src="<?= htmlspecialchars($produto['imagem']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
+            <img src="<?= htmlspecialchars($produto['imagem']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>" width="100" height="100">
                 <h3><?= htmlspecialchars($produto['nome']) ?></h3>
                 <p>R$ <?= number_format($produto['preco'], 2, ',', '.') ?></p>
                 <a href="produto.html?id=<?= $produto['id'] ?>" class="btn btn-primary">Ver mais detalhes</a>

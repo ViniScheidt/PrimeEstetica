@@ -16,9 +16,8 @@
                     <!-- Imagens do Slider -->
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img id="produto-imagem" class="d-block w-100" alt="Cookies">
+                            <img id="produto-imagem" class="d-block w-100" alt="Imagem do Produto" style="max-width: 500px; max-height: 500px;">
                         </div>
-                        <!-- Adicione mais itens se necessário -->
                     </div>
                     <!-- Controles esquerdo e direito -->
                     <a class="carousel-control-prev" href="#imageSlider" data-slide="prev">
@@ -35,9 +34,7 @@
                 <p id="produto-preco" class="price"></p>
                 <!-- Quantidade e Adicionar ao Carrinho -->
                 <div class="quantity mt-3 mb-3">
-                    <button id="decrement" class="btn btn-secondary" type="button">-</button>
                     <input id="quantity" type="number" class="form-control" value="1" min="1">
-                    <button id="increment" class="btn btn-secondary" type="button">+</button>
                 </div>
                 
                 <button id="produto-comprar" class="btn btn-primary">Adicionar ao carrinho</button>
@@ -59,31 +56,6 @@
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="script.js"></script>
-        
-        <script>
-          // Captura o botão "Adicionar ao Carrinho" e o campo de quantidade
-          const addToCartButton = document.getElementById('produto-comprar');
-          const quantityInput = document.getElementById('quantity');
-      
-          // Define o evento de clique no botão "Adicionar ao Carrinho"
-          addToCartButton.addEventListener('click', function() {
-              // Obtém a quantidade selecionada pelo usuário
-              const quantity = quantityInput.value;
-      
-              // Atualiza o valor do campo oculto de quantidade no formulário
-              document.getElementById('quantidade-input').value = quantity || 1;
-              
-              // Preenche os campos ocultos com os dados do produto, independentemente da quantidade
-              document.getElementById('produto-nome-input').value = document.getElementById('produto-nome').textContent;
-              document.getElementById('produto-imagem-input').value = document.getElementById('produto-imagem').src;
-              document.getElementById('produto-descricao-input').value = document.getElementById('produto-descricao').textContent;
-              document.getElementById('produto-preco-input').value = document.getElementById('produto-preco').textContent;
-      
-              // Submete o formulário para a página carrinho.html
-              document.getElementById('carrinho-form').submit();
-          });
-      </script>
-      
     </div>
 </body>
 </html>
