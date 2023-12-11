@@ -1,6 +1,9 @@
 <?php
 session_start(); // Inicia a sessão PHP
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 require 'vendor/autoload.php'; 
 
@@ -73,16 +76,6 @@ try {
                 }
                 ?>
             </li>
-            <li class="nav-item">
-    <?php
-    if (isset($_SESSION['usuario_cargo']) && in_array($_SESSION['usuario_cargo'], [1, 2])) {
-        // Suponha que você tenha uma variável $_SESSION['usuario_id'] que armazena o ID do usuário logado
-        $usuario_id = $_SESSION['usuario_id'];
-        echo '<a class="nav-link" href="editar_usuario.php?id=' . $usuario_id . '">Editar Perfil</a>';
-    }
-    ?>
-</li>
-
             <!-- Verifica se o usuário tem cargo 1 ou 2 -->
             <?php if (isset($_SESSION['usuario_cargo']) && in_array($_SESSION['usuario_cargo'], [1, 2])): ?>
                 <li class="nav-item">

@@ -9,10 +9,6 @@
 <body>
     <div class="container mt-5">
         <h1>Carrinho de Compras</h1>
-
-        <!-- Container para os produtos do carrinho -->
-        <div id="carrinhoContainer" class="mb-3"></div>
-
         <div id="carrinho-details" class="card">
             <div class="card-body">
                 <h2 id="produto-nome" class="card-title"></h2>
@@ -20,56 +16,45 @@
                 <p id="produto-descricao" class="card-text"></p>
                 <p id="produto-preco" class="card-text"></p>
                 <p id="valor-total" class="card-text"></p>
+                <p class="card-text">Quantidade: <span id="quantidade"></span></p>
                 <a href="pagamento.html" class="botao">Finalizar Compra</a>
             </div>
         </div>
     </div>
 
     <script>
-window.onload = function() {
-    var carrinhoContainer = document.getElementById('carrinhoContainer');
-    for (var i = 0; i < localStorage.length; i++) {
-        var chave = localStorage.key(i);
-        var produto = JSON.parse(localStorage.getItem(chave));
+        document.addEventListener('DOMContentLoaded', function () {
+            // Pega os parâmetros da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const nomeProduto = urlParams.get('nome');
+            const imagemProduto = urlParams.get('imagem');
+            const descricaoProduto = urlParams.get('descricao');
+            const precoProduto = urlParams.get('preco');
+            const quantidade = urlParams.get('quantidade');
+    
+            // Preenche os elementos HTML com os detalhes do produto
+            document.getElementById('produto-nome').textContent = nomeProduto;
+            document.getElementById('produto-imagem').src = imagemProduto;
+            document.getElementById('produto-descricao').textContent = descricaoProduto;
+            document.getElementById('produto-preco').textContent = `Preço: R$ ${precoProduto}`;
+            document.getElementById('quantidade').textContent = quantidade;
+    
+            // Limpeza e conversão do preço
+            const precoLimpo = precoProduto.replace('R$', '').replace(',', '.').trim();
+            const precoUnitario = parseFloat(precoLimpo);
+    
+            // Conversão da quantidade
+            const quantidadeNumerica = parseInt(quantidade);
+    
+            // Verifica se ambos são números válidos
+            if (!isNaN(precoUnitario) && !isNaN(quantidadeNumerica)) {
+                const valorTotal = precoUnitario * quantidadeNumerica;
+                document.getElementById('valor-total').textContent = `Valor Total: R$ ${valorTotal.toFixed(2)}`;
+            } else {
+                document.getElementById('valor-total').textContent = 'Valor Total: R$0';
+            }
 
-        if (produto) {
-            var preco = parseFloat(produto.preco.replace('R$ ', '').replace(',', '.')) || 0;
-            var quantidade = parseInt(produto.quantidade) || 1;
-            var valorTotal = preco * quantidade;
-
-            var produtoDiv = document.createElement('div');
-            produtoDiv.innerHTML = `
-                <h3>${produto.nome || 'Nome indisponível'}</h3>
-                <img src="${produto.imagem || 'imagem_padrao.jpg'}" alt="${produto.nome}" style="width:100px;">
-                <p>Descrição: ${produto.descricao || 'Descrição indisponível'}</p>
-                <p>Preço: ${produto.preco || 'Preço indisponível'}</p>
-                <p>Quantidade: <input type="number" value="${produto.quantidade || 1}" min="1" id="quantidade-${produto.id}"></p>
-                <p>Valor Total: R$ ${valorTotal.toFixed(2)}</p>
-                <button onclick="atualizarQuantidade('${produto.id}')">Atualizar Quantidade</button>
-                <button onclick="removerProduto('${produto.id}')">Remover do Carrinho</button>
-            `;
-            carrinhoContainer.appendChild(produtoDiv);
-        }
-    }
-};
-
-// Função para atualizar a quantidade de um produto
-function atualizarQuantidade(produtoId) {
-    var novaQuantidade = document.getElementById('quantidade-' + produtoId).value;
-    var produto = JSON.parse(localStorage.getItem(produtoId));
-    produto.quantidade = novaQuantidade;
-    localStorage.setItem(produtoId, JSON.stringify(produto));
-    // Recarregar a página para atualizar a exibição
-    location.reload();
-}
-
-// Função para remover um produto do carrinho
-function removerProduto(produtoId) {
-    localStorage.removeItem(produtoId);
-    // Recarregar a página para atualizar a exibição
-    location.reload();
-}
-
+        });
     </script>
 </body>
 </html>
