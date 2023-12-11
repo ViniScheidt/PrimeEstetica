@@ -78,6 +78,3 @@ O sistema utiliza o New Relic para monitoramento e análise de desempenho em tem
 ## Contato
 
 Para dúvidas ou colaborações, entre em contato com o autor, Vinicius Scheidt , pelo e-mail: vinische@hotmail.com.
-
-
-test deploy 2 
